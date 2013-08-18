@@ -2,23 +2,14 @@ This is my personal dotfiles repository. Some of the items in here are original;
 
 You should feel free to fork this repository or draw inspiration from it how you see fit.
 
-== Usage
+# Usage
 
 To use these dotfiles in your own environment, follow these steps:
 
-1. Clone the git repository somewhere on your computer
+1. Clone the git repository somewhere on your computer: `git clone git@github.com:fstrube/dotfiles.git ~/.dotfiles`
+2. Run the provided installation script: `~/.dotfiles/install.sh`
 
-~~~~
-git clone git@github.com:fstrube/dotfiles.git ~/.dotfiles
-~~~~
-
-2. Run the provided installation script
-
-~~~~
-~/.dotfiles/install.sh
-~~~~
-
-== Dependencies
+# Dependencies
 * ctags
 * curl
 * git
