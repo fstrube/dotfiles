@@ -1,0 +1,4 @@
+#!/bin/sh
+# shortcut to raking my dotfiles
+
+cd ~/Dropbox/dotfiles > /dev/null 2>&1 && exec rake $@

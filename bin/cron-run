@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+from subprocess import call, Popen, PIPE
+import re
+
+
+def main():
+    """
+    Prompts the user which cronjob they would like to run, then
+    runs it in the shell.
+    """
+
+    # Retrieve the list of cron jobs from the shell
+    p_crontab = Popen(["crontab", "-l"], stdout=PIPE)
+    cronjobs = p_crontab.communicate()[0].split("\n")
+
+    # Filter blank lines and comments
+    re_comment = re.compile(r"^#")
+    cronjobs = filter(lambda x: x != "" and not re_comment.match(x), cronjobs)
+
+    print "Which cronjob would you like to run?\n"
+
+    # Build a numbered menu of cron job commands
+    i = 0
+    for job in cronjobs:
+        i = i + 1
+        command = parse_command(job)
+        print "  %d) %s" % (i, command)
+
+    print "  q) Quit. Do not run anything.\n"
+
+    # Process the users input
+    while True:
+        run = raw_input("Enter number: ")
+
+        # The 'q' option will quit
+        if run == "q":
+            break
+
+        # If a valid option is specified, run the command and quit
+        if run.isdigit() and int(run) > 0 and int(run) <= len(cronjobs):
+            command = parse_command(cronjobs[int(run) - 1])
+            print "\nExecuting: %s" % command
+            print "=" * 80
+            call(command, shell=True)
+            break
+        # Otherwise repeat the loop
+        else:
+            print "Error: Invalid option"
+
+
+def parse_command(job):
+    """
+    Given a single line in crontab syntax, return the command.
+    """
+    parts = re.compile(r" +").split(job.strip())
+
+    command = ' '.join(parts[5:])
+
+    return command
+
+
+if __name__ == '__main__':
+    main()

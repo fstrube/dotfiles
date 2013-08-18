@@ -1,0 +1,8 @@
+#!/bin/sh
+if ! which dosbox > /dev/null ; then
+    echo "Missing dosbox emulator" >&2
+    exit 1
+fi
+
+XWING_PATH=/opt/X-Wing
+dosbox -exit $XWING_PATH/XWING.EXE

@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Quick shortcut to an editor.
+#
+# This means that as I travel back and forth between editors, hey, I don't have
+# to re-learn any arcane commands. Neat.
+#
+# USAGE:
+#
+#   $ e
+#   # => opens the current directory in your editor
+#
+#   $ e .
+#   $ e /usr/local
+#   # => opens the specified directory in your editor
+
+# the $EDITOR variable must be set
+[ -z "$EDITOR" ] && echo "Error: missing \$EDITOR environment variable" >&2 && exit 1
+
+# default behavior is to open the current directory
+target="$1"
+
+[ -z "$target" ] && target="."
+exec $EDITOR "$target"

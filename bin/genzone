@@ -1,0 +1,52 @@
+#!/bin/sh
+# =====
+# Generate your named zone file (DNS)
+
+hostname=${2:-localhost}
+fqdn="$hostname."
+tld=${1:-local}
+
+if which nm-tool > /dev/null ; then
+    forwarders="$(nm-tool | grep DNS | awk '{print $2 ";"}')"
+elif which ipconfig > /dev/null; then
+    forwarders="$(ipconfig getpacket en0 | grep domain_name_server | awk '{ gsub(/[{}]/, "") ; print $3 ";"}')"
+else
+    forwarders=""
+fi
+
+cat << EOD >&2
+===========================================================
+Place the following statement in /etc/named.conf
+===========================================================
+
+options {
+	forwarders {
+		$forwarders
+	};
+};
+
+
+zone "$tld" IN {
+	type master;
+	file "$tld.zone";
+	allow-update { none; };
+};
+
+===========================================================
+
+EOD
+
+cat << EOD
+\$TTL 86400
+\$ORIGIN $tld.
+@           1D IN SOA @ root (
+                42   ; serial
+                3H   ; refresh
+                15M  ; retry
+                1W   ; expiry
+                1D ) ; minimum
+
+    1D IN NS @
+    1D IN A 127.0.0.1
+* 1D IN CNAME $fqdn
+EOD

@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+
+# Add ~/lib/ruby to the load path
+$:.unshift '~/Dropbox/lib/ruby'
+
+require 'basecamp'
+require 'highline/import'
+require 'trollop'
+
+def get_input(prompt='', echo=true)
+  if echo then
+    ask(prompt)
+  else
+    ask(prompt) { |q| q.echo = "*" }
+  end
+end
+
+# Allow user to specify their API token
+opts = Trollop::options do
+  opt :token, "Basecamp API token", :short => 't', :type => :string
+  opt :basecamp_url, "The Basecamp url", :short => 'b', :type => :string, :default => 'globalthinking.basecamphq.com'
+end
+
+if not opts[:token] then
+  username = get_input('Username: ')
+  password = get_input('Password: ', false)
+
+  # Initialize the Basecamp connection and get a token
+  Basecamp.establish_connection!(opts[:basecamp_url], username, password, true)
+
+  # Display the Basecamp token to the user
+  puts ("=" * 80)
+  printf "= Your Basecamp token is: %-52s =\n", Basecamp::Person.me.token
+  puts ("=" * 80)
+else
+  puts 'Connecting with the provided token...'
+  Basecamp.establish_connection!(opts[:basecamp_url], opts[:token], 'X', true)
+end
+
+if not opts[:token] then
+	exit
+end
+
+project = Basecamp::Project.find(9162066) # PR News Online
+puts "#{project.id} => #{project.name}"
+
+# Get all milestones, these are the top-level features
+milestones = Basecamp::Milestone.list(project.id, :upcoming)
+p milestones
+
+Basecamp::TodoList.all( project.id, false ).each do |todo_list|
+  puts "#{todo_list.name}"
+  params = {
+    :todo_list_id => todo_list.id,
+    :completed => false,
+    :responsible_party_id => Basecamp::Person.me.id
+  }
+  Basecamp::TodoItem.all(:params => params).each do |todo_item|
+    # @attributes = {
+    #   "commented_at"=>2010-07-14 15:37:20 UTC,
+    #   "comments_count"=>1,
+    #   "completed"=>false,
+    #   "content"=>"Set up registration data pass through to SalesForce",
+    #   "created_at"=>2008-12-22 22:15:58 UTC,
+    #   "creator_id"=>2754043,
+    #   "due_at"=>nil,
+    #   "id"=>29891216,
+    #   "position"=>3,
+    #   "responsible_party_id"=>2754042,
+    #   "responsible_party_type"=>"Person",
+    #   "updated_at"=>2010-07-14 15:37:20 UTC,
+    #   "responsible_party_name"=>"Franklin Strube",
+    #   "created_on"=>2008-12-22 22:15:58 UTC,
+    #   "creator_name"=>"Jason Kowal"}
+    if not todo_item.completed then
+      assigned = todo_item.responsible_party_id? ? todo_item.responsible_party_name : 'Anybody'
+      due_at = todo_item.due_at? ? todo_item.due_at.strftime('%b %e') : 'Anytime'
+      # printf "  [] %-50.50s (Assigned: %s) [Due: %s]\n", todo_item.content, assigned, due_at
+    end
+  end
+end

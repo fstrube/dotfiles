@@ -1,0 +1,50 @@
+# vim: syntax=apache filetype=apache
+<VirtualHost *:80>
+    ServerName l
+    ServerAlias *.l
+
+    DocumentRoot /home/franklin/Code
+
+    # Emulate VirtualDocumentRoot
+    <IfModule mod_rewrite.c>
+        RewriteEngine on
+        RewriteLog "/home/franklin/.http/log/rewrite.log"
+        RewriteLogLevel 8
+
+        # Fix icons alias for Indexes
+        RewriteCond %{REQUEST_URI} ^/icons/.*$
+        RewriteRule .* - [L]
+
+        # Skip the next three rules if this isn't a subdomain
+        RewriteCond %{HTTP_HOST}               !.+\.l$
+        RewriteRule ^.*$                       -            [S=3]
+
+        # Fix top-level .com domains
+        RewriteCond %{HTTP_HOST}               ^(.*)\.l$
+        RewriteCond %{DOCUMENT_ROOT}/%1.com    -d
+        RewriteRule ^(.+)$                     /%1.com$1    [L,E=SUBDOMAIN_REWRITTEN:true,E=SUBDIR:%1.com]
+
+        # Rewrite subdomains
+        RewriteCond %{HTTP_HOST}               ^(.*)\..*$
+        RewriteCond %{DOCUMENT_ROOT}/%1        -d
+        RewriteRule ^(.+)$                     /%1$1        [L,E=SUBDOMAIN_REWRITTEN:true,E=SUBDIR:%1]
+
+        RewriteCond %{HTTP_HOST}               ^(.*)\..*$
+        RewriteRule ^$                         /%1/index.html [L]
+
+        # Existing files
+    </IfModule>
+
+    <Directory /home/franklin/Sites>
+        Options +Indexes +FollowSymlinks
+        AllowOverride All
+    </Directory>
+
+    <Directory /home/franklin/Code>
+        Options +Indexes +FollowSymlinks
+        AllowOverride All
+    </Directory>
+
+    # Icons directory for +Indexes
+#    Alias /icons /usr/share/apache2/icons
+</VirtualHost>

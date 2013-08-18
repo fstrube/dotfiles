@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -x '/usr/bin/subl' ] ; then
+	exec '/usr/bin/subl' "$@"
+elif [ -x '/Applications/Sublime Text 2.app/Contents/SharedSupport/bin/subl' ] ; then
+	exec '/Applications/Sublime Text 2.app/Contents/SharedSupport/bin/subl' "$@"
+fi

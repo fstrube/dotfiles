@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/usr/bin/time zsh -i -c exit
+/usr/bin/time zsh -i -c exit
+/usr/bin/time zsh -i -c exit
+/usr/bin/time zsh -i -c exit
+/usr/bin/time zsh -i -c exit

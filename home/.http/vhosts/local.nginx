@@ -1,0 +1,28 @@
+# Fix Magento Servers
+server {
+    listen 80;
+
+    server_name ~^(?<subdomain>.*magento.*)\.l;
+
+    root /Users/franklin/Code/$subdomain;
+    index index.php index.html index.htm;
+
+    include /etc/nginx/magento;
+    include /etc/nginx/php.conf;
+}
+
+# Default local servers
+server {
+    listen 80;
+
+    server_name l ~^(?<subdomain>.+)\.l;
+
+    location / {
+        autoindex on;
+        root /Users/franklin/Code/$subdomain;
+        index index.php index.html index.htm;
+    }
+
+    set $php_log /Users/franklin/Code/$subdomain/php_errors.log;
+    include /etc/nginx/php.conf;
+}
