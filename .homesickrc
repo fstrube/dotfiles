@@ -2,3 +2,8 @@
 
 # autmatically link this castle
 system("homesick link #{name}")
+
+# Make sure everything in the bin folder is executable
+puts "Making all binaries executable..."
+system('find "$PWD/home/bin" \! -perm +111 -exec chmod -v +x {} \\;')
+puts "DONE!"
