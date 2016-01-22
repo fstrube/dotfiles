@@ -1,0 +1,8 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_1='/Users/fstrube/Dropbox (Personal)/dotfiles/home/.ssh/conf.d'
+let g:netrw_dirhist_2='/Users/fstrube/Code/ruby-printable'
+let g:netrw_dirhist_3='/Users/fstrube/Code/printable/lib/printable'
+let g:netrw_dirhist_4='/Users/fstrube/Code/magento-lyris/support/arcanist'
+let g:netrw_dirhist_5='/Volumes/Encrypted/fstrube/Library/Application Support/com.axosoft.gitkraken.ShipIt'
+let g:netrw_dirhist_6='/Volumes/Encrypted/fstrube/Library/Caches/com.axosoft.gitkraken'
