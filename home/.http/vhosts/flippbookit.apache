@@ -1,0 +1,6 @@
+<VirtualHost *:80>
+    ServerName flippbookit.local
+
+    RewriteEngine On
+    RewriteRule (.*) /~franklin/Code/flipit/public/$1
+</VirtualHost>

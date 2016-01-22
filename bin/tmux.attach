@@ -1,0 +1,9 @@
+#!/bin/zsh
+COMMAND=/usr/local/bin/tmux
+if [ -n "`$COMMAND list-sessions 2>/dev/null`" ]; then
+	echo "attaching..."
+	$COMMAND -CC attach
+else
+	echo "new session..."
+	$COMMAND -CC
+fi

@@ -3,13 +3,13 @@
     ServerName l
     ServerAlias *.l
 
-    DocumentRoot /home/franklin/Code
+    DocumentRoot /Users/franklin/Code
 
     # Emulate VirtualDocumentRoot
     <IfModule mod_rewrite.c>
         RewriteEngine on
-        RewriteLog "/home/franklin/.http/log/rewrite.log"
-        RewriteLogLevel 8
+        #RewriteLog "/Users/franklin/.http/log/rewrite.log"
+        #RewriteLogLevel 8
 
         # Fix icons alias for Indexes
         RewriteCond %{REQUEST_URI} ^/icons/.*$
@@ -26,7 +26,8 @@
 
         # Rewrite subdomains
         RewriteCond %{HTTP_HOST}               ^(.*)\..*$
-        RewriteCond %{DOCUMENT_ROOT}/%1        -d
+        RewriteCond %{DOCUMENT_ROOT}/%1        -d [OR]
+        RewriteCond %{DOCUMENT_ROOT}/%1        -l
         RewriteRule ^(.+)$                     /%1$1        [L,E=SUBDOMAIN_REWRITTEN:true,E=SUBDIR:%1]
 
         RewriteCond %{HTTP_HOST}               ^(.*)\..*$
@@ -35,14 +36,18 @@
         # Existing files
     </IfModule>
 
-    <Directory /home/franklin/Sites>
+    <Directory /Users/franklin/Sites>
         Options +Indexes +FollowSymlinks
         AllowOverride All
+        Allow from all
+        Require all granted
     </Directory>
 
-    <Directory /home/franklin/Code>
+    <Directory /Users/franklin/Code>
         Options +Indexes +FollowSymlinks
         AllowOverride All
+        Allow from all
+        Require all granted
     </Directory>
 
     # Icons directory for +Indexes

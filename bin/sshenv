@@ -19,6 +19,20 @@ SSH_AUTH_SOCK=$(
   grep ssh-agent    |
   awk '{print $8}'
 )
+SSH_AGENT_PID=$(
+  /usr/sbin/lsof -U |
+  grep Listeners    |
+  grep ssh-agent    |
+  awk '{print $2}'
+)
+
+test $@ = "-" && {
+    echo "export SSH_AGENT_PID=$SSH_AGENT_PID"
+    echo "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+    exit
+}
+
+export SSH_AGENT_PID
 export SSH_AUTH_SOCK
 
 exec "$@"

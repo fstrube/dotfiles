@@ -1,10 +1,37 @@
+# Fix mythos
+server {
+    listen 80;
+
+    root /Users/franklin/Code/mythos;
+    index index.php index.html index.htm;
+
+    server_name mythos.l;
+
+    location = / {
+        rewrite / /dispatch.php;
+    }
+
+    location / {
+        try_files $uri $uri/ @handler;
+    }
+
+    location @handler {
+        rewrite / /dispatch.php;
+    }
+
+    set $php_log /Users/franklin/Code/mythos/var/log/php_errors.log;
+    include /etc/nginx/php.conf;
+}
+
 # Fix Magento Servers
 server {
     listen 80;
 
-    server_name ~^(?<subdomain>.*magento.*)\.l;
+    server_name ~^(?<subdomain>.*?).?magento\.l;
+    set $mage_run_code $subdomain;
+    set $mage_run_type "website";
 
-    root /Users/franklin/Code/$subdomain;
+    root /Users/franklin/Code/magento;
     index index.php index.html index.htm;
 
     include /etc/nginx/magento;
@@ -17,9 +44,10 @@ server {
 
     server_name l ~^(?<subdomain>.+)\.l;
 
+    root /Users/franklin/Code/$subdomain;
+
     location / {
         autoindex on;
-        root /Users/franklin/Code/$subdomain;
         index index.php index.html index.htm;
     }
 

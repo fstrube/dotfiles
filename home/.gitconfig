@@ -5,13 +5,23 @@
 [hub]
         protocol = https
 [user]
-        name = Change Me
-        email = changeme@example.com
+        name = Franklin Strube
+        email = fstrube@globalthinking.com
 [credential]
         helper = osxkeychain
 [alias]
         co = checkout
         count   = !git shortlog -sn
+        lg = log --oneline --graph --decorate
+        branches = !legit branches
+        graft = !legit graft
+        harvest = !legit harvest
+        publish = !legit publish
+        unpublish = !legit unpublish
+        sprout = !legit sprout
+        sync = !legit sync
+        switch = !legit switch
+        resync = !legit resync
 [color]
         diff = auto
         status = auto

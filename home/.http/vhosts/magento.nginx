@@ -1,0 +1,55 @@
+map $http_host $mage_run_code {
+	default '';
+	~^(?<subdomain>.*)\.fulfillment $subdomain;
+	store.ormanager.local store_ormanager_com;
+	store.prnewsonline.local store_prnewsonline_com;
+}
+
+map $http_host $mage_run_type {
+	default store;
+	~^(?<subdomain>.*)\.fulfillment website;
+	store.ormanager.local website;
+	store.prnewsonline.local website;
+}
+
+map $scheme $fastcgi_https {
+	default off;
+	https   on;
+}
+
+# Magento Community Edition
+server {
+	listen 80;
+
+	root /Users/franklin/Code/magento-1.5;
+
+	index index.php index.html index.htm;
+
+	server_name magento.local magento15.local fulfillment.local;
+
+	#set $php_log /Users/franklin/Code/magento-1.5/var/log/php_errors.log;
+
+	include magento;
+	include php.conf;
+}
+
+# Magento Enterprise Edition - for Access Intelligence
+server {
+	listen 80;
+
+	root /Users/franklin/Code/ai-magento/magento;
+
+	index index.php index.html index.html;
+
+	server_name store.prnewsonline.local store.ormanager.local ai-magento.local;
+
+	if ($arg_store != "") {
+		set $mage_run_type "store";
+		set $mage_run_code $arg_store;
+	}
+
+	#set $php_log /Users/franklin/Code/ai-magento/magento/var/log/php_errors.log;
+
+	include magento;
+	include php.conf;
+}

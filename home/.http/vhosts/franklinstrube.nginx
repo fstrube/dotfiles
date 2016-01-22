@@ -1,0 +1,13 @@
+server {
+    listen 80;
+
+    server_name franklinstrube.local 192.168.19.114 *.localtunnel.com;
+
+    root /home/franklin/Code/franklinstrube.com;
+
+    location / {
+        index index.php index.html;
+    }
+
+    include /etc/nginx/php.conf;
+}

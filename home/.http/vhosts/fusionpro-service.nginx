@@ -1,0 +1,12 @@
+# FusionPro Web Service
+server {
+    listen 80;
+
+    server_name render.l;
+
+    root /Users/franklin/Code/fusionpro-service/web;
+
+    include tonic;
+
+    include /etc/nginx/php.conf;
+}

@@ -1,0 +1,3 @@
+home/.http/log
+home/.ssh/*
+!**/README.md

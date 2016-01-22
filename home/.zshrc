@@ -1,4 +1,3 @@
-echo "[$(date)] DEBUG: in ~/.zshrc"
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
 
@@ -17,14 +16,34 @@ ZSH_THEME="robbyrussell"
 # want in your public, versioned repo.
 if [[ -a ~/.localrc ]]
 then
-  echo "[$(date)] DEBUG: loading ~/.localrc"
   source ~/.localrc
 fi
 
 # Include oh-my-zsh core
-echo "[$(date)] DEBUG: loading ~/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
 
 # Any shell scripts in the functions folder become commands (complements of @holman)
-echo "[$(date)] DEBUG: loading ~/.oh-my-zsh/functions"
 autoload -U $ZSH/functions/*(:t)
+
+# rbenv initialization
+if [ -d $HOME/.rbenv/shims ]; then
+	eval "$(rbenv init -)"
+fi
+
+### Added by the Heroku Toolbelt
+if [ -d /usr/local/heroku/bin ]; then
+	export PATH="/usr/local/heroku/bin:$PATH"
+fi
+
+### Add frak to PATH
+if [ -d $HOME/Dropbox/Code/frak/bin ]; then
+	export PATH="$HOME/Dropbox/Code/frak/bin:$PATH"
+fi
+
+### Add composer to PATH
+if [ -d $HOME/.composer/vendor/bin ]; then
+	export PATH="$HOME/.composer/vendor/bin:$PATH"
+fi
+
+
+test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh

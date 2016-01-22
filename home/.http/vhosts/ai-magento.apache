@@ -1,0 +1,6 @@
+<VirtualHost *:80>
+    ServerName ai-magento.local
+    ServerAlias store.prnewsonline.local store.satellitetoday.local store.ormanager.local store.contexomedia.local
+
+    DocumentRoot /Users/franklin/Code/ai-magento/magento
+</VirtualHost>
