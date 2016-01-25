@@ -1,0 +1,17 @@
+#!/bin/bash
+function selection {
+	FILE="${1%%:*}"
+	LINES="${1##*:}"
+
+	[ ! -f $FILE ] && echo "" && return
+
+	awk "NR >= ${LINES%%-*} && NR <= ${LINES##*-}" $FILE
+}
+
+mkdir -p `dirname /tmp/superdiff/$1`
+mkdir -p `dirname /tmp/superdiff/$2`
+
+selection $1 > /tmp/superdiff/$1
+selection $2 > /tmp/superdiff/$2
+
+cd /tmp/superdiff/ && diff -Naurw .$1 .$2

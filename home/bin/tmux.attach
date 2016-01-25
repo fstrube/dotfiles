@@ -1,9 +1,51 @@
-#!/bin/zsh
-COMMAND=/usr/local/bin/tmux
-if [ -n "`$COMMAND list-sessions 2>/dev/null`" ]; then
-	echo "attaching..."
-	$COMMAND -CC attach
+#!/bin/sh
+
+# abort if we're already inside a TMUX session
+[ "$TMUX" = "" ] || {
+	echo "cannot attach tmux from within tmux"
+	exit 1
+}
+
+tmux_path=/usr/local/bin/tmux
+
+# check if we're using iTerm.app
+[ "$TERM_PROGRAM" = "iTerm.app" ] && tmux_options="-CC"
+
+
+
+if [ $($tmux_path list-sessions 2>/dev/null | wc -l) -gt 0 ] ; then
+	PS3="Please choose your session [press q to quit]: "
+	sessions=($($tmux_path list-sessions -F "#S") "NEW SESSION" "SHELL")
+	echo "Available sessions"
+	echo "------------------"
+	while [[ "$session" == "" ]] ; do
+		select session in "${sessions[@]}"
+		do
+			case $session in
+				"NEW SESSION")
+					read -p "Enter new session name: " session_name
+					$tmux_path $tmux_options new-session -s "$session_name"
+					break
+					;;
+				"SHELL")
+					$SHELL --login
+					break;;
+				"")
+					[ "$REPLY" = "q" ] && exit 0
+					echo "Please select a valid option!" >&2
+					break;;
+				*)
+					echo "Attaching to session \"$session\""
+					$tmux_path $tmux_options attach-session -t $session
+					break
+					;;
+			esac
+		done
+	done
+# elif [ $($tmux_path list-sessions 2>/dev/null | wc -l) -eq 1 ] ; then
+# 	echo "resuming session..."
+# 	$tmux_path $tmux_options
 else
-	echo "new session..."
-	$COMMAND -CC
+	[ "$TERM_PROGRAM" = "iTerm.app" ] && tmux_flags="-A -s iterm"
+	$tmux_path $tmux_options new-session $tmux_flags
 fi
