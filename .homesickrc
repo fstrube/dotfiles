@@ -1,5 +1,17 @@
 # vim :filetype=ruby
 
+# install .oh-my-zsh
+system <<-SCRIPT
+if grep /zsh$ /etc/shells > /dev/null 2>&1 ; then
+	if [ ! -d ~/.oh-my-zsh ]; then
+		echo "Cloning Oh My Zsh..."
+		git clone --quiet --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+	fi
+else
+	echo "ZSH not installed"
+fi
+SCRIPT
+
 # autmatically link this castle
 system("homesick link #{name}")
 

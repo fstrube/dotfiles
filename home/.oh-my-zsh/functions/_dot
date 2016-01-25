@@ -1,0 +1,3 @@
+#compdef dot
+cd ~/Dropbox/dotfiles
+_rake

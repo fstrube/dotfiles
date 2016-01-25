@@ -1,2 +1,4 @@
 .vim
 bin
+.oh-my-zsh/functions
+.oh-my-zsh/custom
