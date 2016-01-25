@@ -1,0 +1,112 @@
+#!/bin/sh
+
+SCRIPT=$0
+COMMAND=${1:-"start"}
+LABEL=${LABEL:?"Missing \$LABEL"}
+PIDFILE=${PIDFILE:-"~/.mysqld/mysqld.pid"}
+SOCKET=${SOCKET:-"~/.mysqld/mysqld.sock"}
+KEYFILE=${KEYFILE:?"Missing \$KEYFILE"}
+KEYDIRS=${KEYDIRS:-"~/.ssh"}
+SOCAT=${SOCAT:?"Missing \$SOCAT"}
+
+
+case $COMMAND in
+status)
+    RUNNING=0
+    if [ -r "$PIDFILE" ]; then
+        PID=$(cat $PIDFILE)
+        ps -e | awk '{print $1}' | grep ^$PID$ > /dev/null 2>&1
+        [ $? -eq 0 ] && RUNNING=1
+    fi
+
+    if [ $RUNNING -eq 0 ]; then
+        echo "$LABEL MySQL is not running"
+    else
+        echo "$LABEL MySQL is running (pid is $PID)"
+        echo -n "  Checking socket ($SOCKET)..."
+        ls $SOCKET > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "OK"
+        else
+            echo "OFFLINE"
+            exit 2
+        fi
+    fi
+    ;;
+
+start)
+    RUNNING=0
+    if [ -r "$PIDFILE" ]; then
+        PID=$(cat $PIDFILE)
+        ps -e | awk '{print $1}' | grep ^$PID$ > /dev/null 2>&1
+        [ $? -eq 0 ] && RUNNING=1
+    fi
+
+    if [ $RUNNING -eq 1 ]; then
+        $0 status
+        exit $?
+    fi
+    
+    echo -n "Starting $LABEL MySQL..."
+    
+    mkdir -p $(dirname $PIDFILE) > /dev/null 2>&1
+    touch $PIDFILE
+    if [ ! -w $PIDFILE ]; then
+        echo "FAILED (cannot read $PIDFILE)"
+        exit 1
+    fi
+
+    if [ -n "$KEYFILE" ]; then 
+        for KEYDIR in $KEYDIRS; do
+            if [ -d $KEYDIR ]; then
+                eval `ssh-agent` > /dev/null 2>&1
+                ssh-add $KEYDIR/$KEYFILE > /dev/null 2>&1
+                break
+            fi
+        done
+    fi
+
+    SOCAT="$SOCAT >/dev/null 2>&1 &"
+    eval $SOCAT
+    PID=$!
+    sleep 2
+    kill -0 $PID >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        mkdir -p $(dirname $PIDFILE) >/dev/null 2>&1
+        echo -n $PID > $PIDFILE
+        chmod a+w $SOCKET
+        echo "DONE"
+    else
+        if [ -n "$KEYFILE" ]; then
+            eval `ssh-agent -k` > /dev/null 2>&1
+        fi
+        echo "FAILED"
+        exit 1
+    fi
+    ;;
+
+stop)
+    if [ -r "$PIDFILE" ]; then
+        echo -n "Stopping $LABEL MySQL..."
+        kill -HUP `cat $PIDFILE` > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            rm $SOCKET > /dev/null 2>&1
+            echo "DONE"
+        else
+            echo "FAILED"
+            exit 1
+        fi
+    else
+        echo "$LABEL MySQL is not running"
+    fi
+    ;;
+
+restart)
+    $SCRIPT stop && $SCRIPT start
+    ;;
+
+*)
+    $SCRIPT start
+    ;;
+
+esac

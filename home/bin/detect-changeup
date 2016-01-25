@@ -1,0 +1,47 @@
+#!/bin/sh
+
+function mount_share() {
+    path="$1"
+    folder=/tmp/detect-changeup/${path:2}
+
+    mkdir -p "$folder" > /dev/null 2>&1
+    mount -t smbfs "$path" "$folder" && echo $folder
+#   mount -t smbfs "$path" "/tmp/detect-changeup/${path:2}" && echo "/tmp/detect-changeup/${path:2}"
+}
+
+function umount_share() {
+    path="$1"
+    folder=/tmp/detect-changeup/${path:2}
+
+    umount "$folder"
+}
+
+servers=${1:-"file-srv appserv global-srv exch-srv bazooka snake-eyes"}
+for server in $servers; do
+    echo "\nScanning $server\n====================================="
+    smbutil view //$server | grep '.*Disk' | grep -v "\\\$" | cut -c1-30 | while read share; do
+        umount_share "//$server/$share" > /dev/null 2>&1
+
+        printf . .
+        folder=$(mount_share "//$server/$share")
+
+        if [ -n "$folder" ]; then
+            changeup_files=$(find "$folder" -name 'autorun.inf' -name 'x.mpeg' -name 'Sexy.exe' -name 'Password*.exe' -maxdepth 2)
+            if [ -n "$changeup_files" ]; then
+                echo $changeup_files
+            fi
+
+            exe_files=$(find "$folder" -maxdepth 1 -name '*.exe' | wc -l)
+            if [ "$exe_files" -gt 0 ]; then
+                echo ""
+                echo "Exe files found on: //$server/$share"
+                find "$folder" -maxdepth 1 -name '*.exe'
+                echo ""
+            fi
+
+            sleep 2
+            umount_share "//$server/$share"
+        fi
+    done
+done
+echo ""
